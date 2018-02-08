@@ -1,50 +1,94 @@
 import pandas as pd
 from FeatSel import Setup
+import sys
+from copy import copy
+import random
+import math
 
-"""
-A wrapper to your dataset
-
-This wrapper contains functions for performing feature selction and data cleaning.
-
-Args:
-    setup: A Setup object (optional)
-
-"""
+def exp_schedule(k=1000, lam=0.1, limit=100):
+    """One possible schedule function for simulated annealing"""
+    return lambda t: (k * math.exp(-lam * t) if t < limit else 0)
 
 class DatasetWrapper:
-	def __init__(self, setup = None):
-		if setup == None:
-			setup = Setup()
-		assert isinstance(setup, Setup)
-		for key, value in vars(setup).items():
-			setattr(self, key, value)
+    """
+    A wrapper to your dataset
 
-	# Returns (error, subset of features)
-	def sequential_forward(self):
-		# All Features
-		features = list(range(self.f_size))
+    This wrapper contains functions for performing feature selction and data cleaning.
 
-		# Initial subset
-		subset, best_error = [], float('inf')
+    Args:
+        setup: A Setup object (optional)
+    """
 
-		# Run Algorithm
-		while(1):
-			curr_error, curr_feat = float('inf'), None
-			for feature in features:
-				subset.append(feature)
-				error = self.evaluatorFunction(self.data, subset)
+    def __init__(self, setup = None):
+        if setup == None:
+            setup = Setup()
+        assert isinstance(setup, Setup)
+        for key, value in vars(setup).items():
+            setattr(self, key, value)
 
-				if error < curr_error:
-					curr_error, curr_feat = error, feature
+    # Returns (error, subset of features)
+    def sequential_forward(self):
+        # All Features
+        features = list(range(self.f_size))
 
-				subset.remove(feature)
+        # Initial subset
+        subset, best_error = [], float('inf')
 
-			if curr_error > best_error:
-				break
-			else:
-				best_error = curr_error
-				subset.append(curr_feat)
-				features.remove(curr_feat)
+        # Run Algorithm
+        while(1):
+            curr_error, curr_feat = float('inf'), None
+            for feature in features:
+                subset.append(feature)
+                error = self.evaluatorFunction(self.data, subset)
 
-		self.subset = subset
-		return (best_error, subset)
+                if error < curr_error:
+                    curr_error, curr_feat = error, feature
+
+                subset.remove(feature)
+
+            if curr_error > best_error:
+                break
+            else:
+                best_error = curr_error
+                subset.append(curr_feat)
+                features.remove(curr_feat)
+
+        self.subset = subset
+        return (best_error, subset)
+
+    def simulated_annealing(self, schedule=exp_schedule()):
+
+        def _expand(features):
+            neighbors = []
+            for i in range(self.f_size):
+                if i in features:
+                    feature_copy = copy(features)
+                    feature_index = feature_copy.index(i)
+                    feature_copy[feature_index:feature_index+1] = []
+                else:
+                    feature_copy = copy(features)
+                    feature_copy.append(i)
+                neighbors.append(feature_copy)
+            neighbors.append([1])
+            return neighbors
+
+        def _probability(p):
+            """Return true with probability p."""
+            return p > random.uniform(0.0, 1.0)
+
+
+        features = list(range(self.f_size))
+        for t in range(sys.maxsize):
+            T = schedule(t)
+            if T == 0:
+                return (self.evaluatorFunction(self.data, features), features)
+            neighbors = _expand(features)
+            if not neighbors:
+                return (self.evaluatorFunction(self.data, features) ,features)
+            next = random.choice(neighbors)
+            if len(next) == 0:
+                delta_e = sys.maxsize
+            else:
+                delta_e = self.evaluatorFunction(self.data, next) - self.evaluatorFunction(self.data, features)
+            if delta_e < 0 or _probability(math.exp(-delta_e / T)):
+                features = next
