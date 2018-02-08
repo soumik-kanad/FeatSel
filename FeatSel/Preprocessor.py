@@ -1,25 +1,24 @@
 import csv
+import pandas as pd
 import numpy as np
-
-"""
-Usage
-
->>> from FeatSel import Preprocessor
->>> p=Preprocessor.Preprocessor()
->>> p.load('datasamples/')
->>> your_data=p.Preprocess()
-
-#your_data = {'data':DATA, 'target':TARGET}
-
-"""
-
+from sklearn import preprocessing
+import os
 
 class Preprocessor:
+	"""
+	Usage
+
+	>>> from FeatSel.Preprocessor import Preprocessor
+	>>> your_data=Preprocessor().load(folder,filename).Preprocess()
+
+	#your_data = {'data':DATA, 'target':TARGET}
+
+	"""
 	def __init__(self):
 		self.data=[];           #list of rows of data
 		self.target=[];         #target value
 		self.feature_names=[]   #column names
-		self.feature_type=[]    #possible types - INT, FLOAT, CATEGORY 
+		self.feature_type=[]    #possible types - INT, FLOAT, CATEGORY
 
 	def load(self, path):
 		with open(path+'data.csv', newline='') as csvfile:
@@ -34,7 +33,7 @@ class Preprocessor:
 		#2nd line of data.csv is feature_name
 		#next line onwards data
 		## 1st line of target.csv contains text
-		## next line onwards it contains the target value of each row 
+		## next line onwards it contains the target value of each row
 		self.data=data_list[2:]
 		self.target=target_list[1:]
 		self.feature_names=data_list[1]
