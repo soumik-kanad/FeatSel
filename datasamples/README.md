@@ -8,4 +8,5 @@ Supported datasets
 
 |      Datasets     |
 |-------------------|
-|  winequality-red  |
+|  [winequality-red](https://archive.ics.uci.edu/ml/datasets/wine+quality)  |
+|  [Cryotherapy](https://archive.ics.uci.edu/ml/datasets/Cryotherapy+Dataset+)  |
