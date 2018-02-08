@@ -1,7 +1,19 @@
 import csv
 import numpy as np
 
+"""
+Usage
+
+>>> from FeatSel import Preprocessor
+>>> p=Preprocessor.Preprocessor()
+>>> p.load('datasamples/')
+>>> your_data=p.Preprocess()
+
 #your_data = {'data':DATA, 'target':TARGET}
+
+"""
+
+
 class Preprocessor:
 	def __init__(self):
 		self.data=[];           #list of rows of data
@@ -37,7 +49,7 @@ class Preprocessor:
 
 	def isint(self,value):
 		try:
-			float(value)
+			int(value)
 			return True
 		except ValueError:
 			return False
@@ -85,13 +97,13 @@ class Preprocessor:
 				for row in self.data:
 					if self.isint(row[i]):
 						row[i]=int(row[i])
-				normalize(i)
+				self.normalize(i)
 			elif self.feature_type[i] == 'FLOAT':
 				#convert to float
 				for row in self.data:
 					if self.isfloat(row[i]):
-						row[i]=int(row[i])
-				normalize(i)
+						row[i]=float(row[i])
+				self.normalize(i)
 			else:
 				categories=list(set([row[i] for row in self.data]))
 				category_value={}
