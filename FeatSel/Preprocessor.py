@@ -4,116 +4,44 @@ import numpy as np
 from sklearn import preprocessing
 import os
 
-class Preprocessor:
-	"""
-	Usage
-
-	>>> from FeatSel.Preprocessor import Preprocessor
-	>>> your_data=Preprocessor().load(folder,filename).Preprocess()
-
-	#your_data = {'data':DATA, 'target':TARGET}
-
-	"""
-	def __init__(self):
+#your_data = {'data':DATA, 'target':TARGET}
+class Preprocessor(object):
+	def __init__(self, type='Default'):
+		self.type=type
 		self.data=[];           #list of rows of data
 		self.target=[];         #target value
 		self.feature_names=[]   #column names
-		self.feature_type=[]    #possible types - INT, FLOAT, CATEGORY
-
-	def load(self, path):
-		with open(path+'data.csv', newline='') as csvfile:
-			reader = csv.reader(csvfile)
-			data_list=list(reader)
-
-		with open(path+'target.csv', newline='') as csvfile:
-			reader = csv.reader(csvfile)
-			target_list=list(reader)
-
-		#1st line of data.csv is feature_type
-		#2nd line of data.csv is feature_name
-		#next line onwards data
-		## 1st line of target.csv contains text
-		## next line onwards it contains the target value of each row
-		self.data=data_list[2:]
-		self.target=target_list[1:]
-		self.feature_names=data_list[1]
-		self.feature_type=data_list[0]
-
-	def isfloat(self,value):
-		try:
-			float(value)
-			return True
-		except ValueError:
-			return False
-
-	def isint(self,value):
-		try:
-			int(value)
-			return True
-		except ValueError:
-			return False
-
-	def fill_empty_with_avg(self):
-		for i in range(len(self.feature_names)):
-			if self.feature_type[i] == 'INT':
-				#find row average
-				temp_list=[]
-				for row in self.data:
-					if self.isint(row[i]):
-						temp_list.append(row[i])
-				average=np.floor(np.mean(temp_list))
-				#replace unknown values by average
-				for row in self.data:
-					if not(self.isint(row[i])):
-						row[i]=average
-
-			elif self.feature_type[i] == 'FLOAT':
-				#find row average
-				temp_list=[]
-				for row in self.data:
-					if self.isfloat(row[i]):
-						temp_list.append(row[i])
-				average=np.mean(temp_list)
-				#replace unknown values by average
-				for row in self.data:
-					if not(self.isfloat(row[i])):
-						row[i]=average
-
-			else:
-				pass
+		self.class_name=""
 
 
-
-	def normalize(self, column_no):
-		#to be done
-		pass
+	def load(self, path, filename):
+		absolute_path = os.path.join(path, filename)
+		assert os.path.exists(absolute_path)
+		if filename.lower().endswith('.csv'):
+			csv_load = pd.read_csv(absolute_path)
+			self.feature_names = csv_load.columns[:-1]
+			self.class_name = csv_load.columns[-1]
+			self.data = csv_load[self.feature_names]
+			self.target = csv_load[self.class_name]
+		elif filename.lower().endswith('.json'):
+			# TODO: Format for json type.
+			pass
+		elif filename.lower().endswith('.xlsx'):
+			xlsx_load = pd.read_excel(absolute_path)
+			self.feature_names = xlsx_load.columns[:-1]
+			self.class_name = xlsx_load.columns[-1]
+			self.data = xlsx_load[self.feature_names]
+			self.target = xlsx_load[self.class_name]
+		return self
 
 	def Preprocess(self):
-		#for every column with id i
-		for i in range(len(self.feature_names)):
-			if self.feature_type[i] == 'INT':
-				#convert to integet
-				for row in self.data:
-					if self.isint(row[i]):
-						row[i]=int(row[i])
-				self.normalize(i)
-			elif self.feature_type[i] == 'FLOAT':
-				#convert to float
-				for row in self.data:
-					if self.isfloat(row[i]):
-						row[i]=float(row[i])
-				self.normalize(i)
-			else:
-				categories=list(set([row[i] for row in self.data]))
-				category_value={}
-				for j in  range(len(categories)):
-					category_value[categories[j]]=j
-
-				for row in self.data:
-					row[i]=category_value[row[i]]
-		self.fill_empty_with_avg()
-		return {'data':self.data , 'target':self.target}
-
-
-
-#path='../datasamples/'
+		if self.type == 'Default':
+			formated_data = {}
+			scaler = preprocessing.StandardScaler().fit(self.data)
+			formated_data['data'] = scaler.transform(self.data)
+			formated_data['target'] = self.target
+			formated_data['feature_names'] = self.feature_names
+			formated_data['class_name'] = self.class_name
+			return formated_data
+		else:
+			raise NotImplementedError

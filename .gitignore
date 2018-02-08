@@ -75,3 +75,4 @@ target/
 # Sample Datasets
 datasamples/*.csv
 datasamples/*.json
+datasamples/*.xlsx
