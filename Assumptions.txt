@@ -1,0 +1,16 @@
+|     Assumption    |
+|-------------------|
+Data:
+1. Data has only three types of columns - Integer, Float or Strings.
+2. Strings are by defualt considered as Categorised data type.
+3. Hence these strings are one-hot encoded for further preprocessing.
+4. It is assumed that the last column of the data file contains the target values.
+5. The allowed data file types are csv, xlsx and json.
+6. Futher preprocessing consists of standard scaling.
+
+
+|      Datasets     |
+|-------------------|
+|  [red-wine-quality](https://www.kaggle.com/uciml/red-wine-quality-cortez-et-al-2009/data)  |
+|  [winequality-red](https://archive.ics.uci.edu/ml/datasets/wine+quality)  |
+|  [Cryotherapy](https://archive.ics.uci.edu/ml/datasets/Cryotherapy+Dataset+)  |

@@ -61,7 +61,7 @@ class Setup:
 
 	def loadDefaults(self):
 		self.data_sample_folder = join(dirname(dirname(__file__)), 'datasamples')
-		self.data_sample_filename = 'Cryotherapy.xlsx'
+		self.data_sample_filename = 'winequality.csv' #'Cryotherapy.xlsx'
 		self.test_size = 0.4
 		self.data = Preprocessor().load(self.data_sample_folder, self.data_sample_filename).Preprocess()
 		self.data = Data(self.data)

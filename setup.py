@@ -21,5 +21,5 @@ setup(
     url='https://github.com/soumik-kanad/FeatSel',
     license=license,
     packages=find_packages(exclude=('tests', 'docs', 'datasamples'))
-    requires=['pytest', 'spinx']
+    requires=['pytest', 'spinx', 'sklearn', 'numpy', 'pandas']
 )
