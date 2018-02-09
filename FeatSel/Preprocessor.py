@@ -32,10 +32,21 @@ class Preprocessor(object):
 			self.class_name = xlsx_load.columns[-1]
 			self.data = xlsx_load[self.feature_names]
 			self.target = xlsx_load[self.class_name]
+
 		return self
 
 	def Preprocess(self):
 		if self.type == 'Default':
+
+			#converting string type columns into category type
+			categorical_columns=[]
+			for col in self.data.columns:
+				if self.data[col].dtype==np.object:  #by default string data was of object type
+					categorical_columns.append(col)
+					self.data[col] = self.data[col].astype('category')
+			#for one hot encoding
+			self.data=pd.get_dummies(self.data,columns=categorical_columns) 
+			#transformation and scaling
 			formated_data = {}
 			scaler = preprocessing.StandardScaler().fit(self.data)
 			formated_data['data'] = scaler.transform(self.data)
@@ -45,3 +56,6 @@ class Preprocessor(object):
 			return formated_data
 		else:
 			raise NotImplementedError
+
+
+
