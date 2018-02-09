@@ -17,6 +17,13 @@ class DatasetWrapper:
 
     Args:
         setup: A Setup object (optional)
+
+    >>>data = FeatSel.DatasetWrapper() 
+    >>>data.sequential_forward()
+    (0.073777694751080772, [2, 4, 1])
+    >>>data.simulated_annealing()
+    (0.1114614410773586, [1, 4, 2])
+
     """
 
     def __init__(self, setup = None):
@@ -28,6 +35,14 @@ class DatasetWrapper:
 
     # Returns (error, subset of features)
     def sequential_forward(self):
+        """
+        Sequential forwarding metaheuristic for subset selection.
+
+        Returns:
+            best_error : value corresponding to psuedo best fearure subset
+            feature_subset : A list of feature_indexes
+        """
+
         # All Features
         features = list(range(self.f_size))
 
@@ -57,6 +72,16 @@ class DatasetWrapper:
         return (best_error, subset)
 
     def simulated_annealing(self, schedule=exp_schedule()):
+        """
+        Simulated annealing metaheuristic for subset selection.
+
+        Args :
+            schedule : A lambda function for getting the time -> temperature mapping.
+
+        Returns:
+            best_error : value corresponding to psuedo best fearure subset
+            feature_subset : A list of feature_indexes
+        """
 
         def _expand(features):
             neighbors = []

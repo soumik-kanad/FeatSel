@@ -4,18 +4,28 @@ Documentation for the Code
 .. automodule:: FeatSel
 
 
-useful #1 -- auto members
+Setup class
 =========================
 
-This is something I want to say that is not in the docstring.
-
 .. autoclass:: FeatSel.Setup
-   :members: loadDefaults, verifySetup
+   :members: __init__, loadDefaults, verifySetup
 
-useful #2 -- explicit members
+DatasetWrapper class
 =============================
 
-This is something I want to say that is not in the docstring.
-
 .. autoclass:: FeatSel.DatasetWrapper
-   :members: sequential_forward
+   :members: sequential_forward, simulated_annealing
+
+Data class
+=============================
+
+A dictionary to object conversion tool
+
+.. autoclass:: FeatSel.Data
+   :members: __init__
+
+Preprocess class
+=============================
+
+.. autoclass:: FeatSel.Preprocessor
+   :members: __init__, load, Preprocess
