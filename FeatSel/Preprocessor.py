@@ -93,7 +93,8 @@ class Preprocessor(object):
 			scaler = preprocessing.StandardScaler().fit(self.data)
 			formated_data['data'] = scaler.transform(self.data)
 			formated_data['target'] = self.target
-			formated_data['feature_names'] = self.feature_names
+			#formated_data['feature_names'] = self.feature_names
+			formated_data['feature_names'] = self.data.columns
 			formated_data['class_name'] = self.class_name
 			return formated_data
 		else:

@@ -69,7 +69,8 @@ class DatasetWrapper:
                 features.remove(curr_feat)
 
         self.subset = subset
-        return (best_error, subset)
+        #return (best_error, subset)
+        return (best_error, [self.data.feature_names[i] for i in subset])
 
     def simulated_annealing(self, schedule=exp_schedule()):
         """
@@ -106,10 +107,12 @@ class DatasetWrapper:
         for t in range(sys.maxsize):
             T = schedule(t)
             if T == 0:
-                return (self.evaluatorFunction(self.data, features), features)
+                #return (self.evaluatorFunction(self.data, features), features)
+                return (self.evaluatorFunction(self.data, features), [self.data.feature_names[i] for i in features])
             neighbors = _expand(features)
             if not neighbors:
-                return (self.evaluatorFunction(self.data, features) ,features)
+                #return (self.evaluatorFunction(self.data, features) ,features)
+                return (self.evaluatorFunction(self.data, features), [self.data.feature_names[i] for i in features])
             next = random.choice(neighbors)
             if len(next) == 0:
                 delta_e = sys.maxsize
