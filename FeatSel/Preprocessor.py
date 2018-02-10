@@ -45,7 +45,7 @@ class Preprocessor(object):
 		absolute_path = os.path.join(path, filename)
 		assert os.path.exists(absolute_path)
 		if filename.lower().endswith('.csv'):
-			csv_load = pd.read_csv(absolute_path)
+			csv_load = pd.read_csv(absolute_path)	
 			self.feature_names = csv_load.columns[:-1]
 			self.class_name = csv_load.columns[-1]
 			self.data = csv_load[self.feature_names]
@@ -85,13 +85,28 @@ class Preprocessor(object):
 				if self.data[col].dtype==np.object:  #by default string data was of object type
 					categorical_columns.append(col)
 					self.data[col] = self.data[col].astype('category')
+			
+
 			#for one hot encoding
 			self.data=pd.get_dummies(self.data,columns=categorical_columns) 
 
+
 			#transformation and scaling
 			formated_data = {}
-			scaler = preprocessing.StandardScaler().fit(self.data)
-			formated_data['data'] = scaler.transform(self.data)
+			
+			# print(self.data['alcohol'])
+
+			imputer = preprocessing.Imputer().fit(self.data)
+			formated_data['data'] = imputer.transform(self.data)
+
+			# print(self.data.columns, formated_data['data'][-1])
+
+			# For handling missing values
+			scaler = preprocessing.StandardScaler()
+			formated_data['data'] = scaler.fit_transform(formated_data['data'])
+
+			# print(formated_data['data'][:,:-1])
+
 			formated_data['target'] = self.target
 			#formated_data['feature_names'] = self.feature_names
 			formated_data['feature_names'] = self.data.columns
