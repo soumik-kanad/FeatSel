@@ -3,7 +3,7 @@ import argparse
 from sklearn import datasets
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 import sys
 from FeatSel.Data import Data
 from FeatSel.Preprocessor import Preprocessor
@@ -69,10 +69,18 @@ class Setup:
 
 		# Evaluate subset of features
 		def _DefaultEvaluate(data, feature_subset):
-			X_train, X_test, Y_train, Y_test, = train_test_split(data.data[:, feature_subset], data.target, test_size=self.test_size, random_state=42)
-			model = LinearRegression().fit(X_train, Y_train)
-			Y_pred = model.predict(X_test)
-			return mean_squared_error(Y_test, Y_pred)
+			X = data.data[:, feature_subset]
+			Y = data.target
+
+			kf = KFold(n_splits=4)
+			avg_error = 0
+			for train_index, test_index in kf.split(X):
+				X_train, X_test, Y_train, Y_test = X[train_index], X[test_index], Y[train_index], Y[test_index]
+				model = LinearRegression().fit(X_train, Y_train)
+				Y_pred = model.predict(X_test)
+				avg_error += mean_squared_error(Y_test, Y_pred)
+			
+			return avg_error/4
 
 		self.evaluatorFunction = _DefaultEvaluate
 

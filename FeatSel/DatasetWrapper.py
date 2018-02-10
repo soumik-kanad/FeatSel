@@ -4,6 +4,7 @@ import sys
 from copy import copy
 import random
 import math
+import numpy as np
 
 def exp_schedule(k=1000, lam=0.1, limit=100):
     """One possible schedule function for simulated annealing"""
@@ -49,8 +50,10 @@ class DatasetWrapper:
         # Initial subset
         subset, best_error = [], float('inf')
 
+        plot, f_count = [], 0
+
         # Run Algorithm
-        while(1):
+        while True:
             curr_error, curr_feat = float('inf'), None
             for feature in features:
                 subset.append(feature)
@@ -62,11 +65,19 @@ class DatasetWrapper:
                 subset.remove(feature)
 
             if curr_error > best_error:
+                f_count += 1
+                plot.append([f_count, curr_error])
+                np.savetxt("sf.csv", plot, delimiter=',')    
+                
                 break
             else:
                 best_error = curr_error
                 subset.append(curr_feat)
                 features.remove(curr_feat)
+
+                f_count += 1
+                plot.append([f_count, best_error])
+
 
         self.subset = subset
         #return (best_error, subset)
@@ -102,21 +113,34 @@ class DatasetWrapper:
             """Return true with probability p."""
             return p > random.uniform(0.0, 1.0)
 
+        plot = []
 
         features = list(range(self.f_size))
         for t in range(sys.maxsize):
             T = schedule(t)
             if T == 0:
                 #return (self.evaluatorFunction(self.data, features), features)
-                return (self.evaluatorFunction(self.data, features), [self.data.feature_names[i] for i in features])
+                final_cost = self.evaluatorFunction(self.data, features)
+                plot.append([T, final_cost])
+                np.savetxt("sa.csv", plot, delimiter=',')    
+
+                return (final_cost, [self.data.feature_names[i] for i in features])
             neighbors = _expand(features)
             if not neighbors:
                 #return (self.evaluatorFunction(self.data, features) ,features)
-                return (self.evaluatorFunction(self.data, features), [self.data.feature_names[i] for i in features])
+                
+                final_cost = self.evaluatorFunction(self.data, features)
+                plot.append([T, final_cost])
+                np.savetxt("sa.csv", plot, delimiter=',')    
+
+
+                return (final_cost, [self.data.feature_names[i] for i in features])
             next = random.choice(neighbors)
             if len(next) == 0:
                 delta_e = sys.maxsize
             else:
-                delta_e = self.evaluatorFunction(self.data, next) - self.evaluatorFunction(self.data, features)
+                neighbor_cost = self.evaluatorFunction(self.data, next)
+                plot.append([T, neighbor_cost])
+                delta_e = neighbor_cost - self.evaluatorFunction(self.data, features)
             if delta_e < 0 or _probability(math.exp(-delta_e / T)):
                 features = next
