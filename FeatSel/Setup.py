@@ -69,7 +69,7 @@ class Setup:
 
 		# Evaluate subset of features
 		def _DefaultEvaluate(data, feature_subset):
-			X_train, X_test, Y_train, Y_test, = train_test_split(data.data[:, feature_subset], data.target, test_size=self.test_size)
+			X_train, X_test, Y_train, Y_test, = train_test_split(data.data[:, feature_subset], data.target, test_size=self.test_size, random_state=42)
 			model = LinearRegression().fit(X_train, Y_train)
 			Y_pred = model.predict(X_test)
 			return mean_squared_error(Y_test, Y_pred)
