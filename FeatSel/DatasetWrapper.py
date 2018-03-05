@@ -6,7 +6,7 @@ import random
 import math
 import numpy as np
 
-def exp_schedule(k=1000, lam=0.1, limit=100):
+def exp_schedule(k=1000, lam=0.1, limit=150):
     """One possible schedule function for simulated annealing"""
     return lambda t: (k * math.exp(-lam * t) if t < limit else 0)
 
@@ -121,7 +121,7 @@ class DatasetWrapper:
             if T == 0:
                 #return (self.evaluatorFunction(self.data, features), features)
                 final_cost = self.evaluatorFunction(self.data, features)
-                plot.append([T, final_cost])
+                plot.append([t, final_cost])
                 np.savetxt("sa.csv", plot, delimiter=',')    
 
                 return (final_cost, [self.data.feature_names[i] for i in features])
@@ -130,7 +130,7 @@ class DatasetWrapper:
                 #return (self.evaluatorFunction(self.data, features) ,features)
                 
                 final_cost = self.evaluatorFunction(self.data, features)
-                plot.append([T, final_cost])
+                plot.append([t, final_cost])
                 np.savetxt("sa.csv", plot, delimiter=',')    
 
 
@@ -140,7 +140,7 @@ class DatasetWrapper:
                 delta_e = sys.maxsize
             else:
                 neighbor_cost = self.evaluatorFunction(self.data, next)
-                plot.append([T, neighbor_cost])
+                plot.append([t, neighbor_cost])
                 delta_e = neighbor_cost - self.evaluatorFunction(self.data, features)
             if delta_e < 0 or _probability(math.exp(-delta_e / T)):
                 features = next

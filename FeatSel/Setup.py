@@ -61,9 +61,12 @@ class Setup:
 
 	def loadDefaults(self):
 		self.data_sample_folder = join(dirname(dirname(__file__)), 'datasamples')
-		self.data_sample_filename = 'winequality.csv' #'Cryotherapy.xlsx'
+		# self.data_sample_filename = 'featuresdf.csv'
+		# self.data_sample_filename = 'elections_2013.csv'
+		# self.data_sample_filename = 'Cryotherapy.xlsx'
+		self.data_sample_filename = 'winequality.csv'
 		self.test_size = 0.4
-		self.data = Preprocessor().load(self.data_sample_folder, self.data_sample_filename).Preprocess()
+		self.data = Preprocessor().load(self.data_sample_folder, self.data_sample_filename, "mean").Preprocess()
 		self.data = Data(self.data)
 		self.f_size = self.data.data.shape[1]
 

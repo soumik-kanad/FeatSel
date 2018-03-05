@@ -28,9 +28,10 @@ class Preprocessor(object):
 		self.target=[];         #target value
 		self.feature_names=[]   #column names
 		self.class_name=""
+		self.strategy = "mean"
 
 
-	def load(self, path, filename):
+	def load(self, path, filename, strategy):
 		"""
         Loads data from csv, json and xlsx files
 
@@ -51,7 +52,6 @@ class Preprocessor(object):
 			self.data = csv_load[self.feature_names]
 			self.target = csv_load[self.class_name]
 		elif filename.lower().endswith('.json'):
-			# TODO: NOt tested, please test.
 			json_load = pd.read_json(absolute_path)
 			self.feature_names = json_load.columns[:-1]
 			self.class_name = json_load.columns[-1]
@@ -64,6 +64,9 @@ class Preprocessor(object):
 			self.class_name = xlsx_load.columns[-1]
 			self.data = xlsx_load[self.feature_names]
 			self.target = xlsx_load[self.class_name]
+
+		if strategy is not None:
+			self.strategy = strategy
 
 		return self
 
@@ -96,13 +99,13 @@ class Preprocessor(object):
 			
 			# print(self.data['alcohol'])
 
-			imputer = preprocessing.Imputer().fit(self.data)
+			imputer = preprocessing.Imputer(strategy=self.strategy).fit(self.data)
 			formated_data['data'] = imputer.transform(self.data)
 
 			# print(self.data.columns, formated_data['data'][-1])
 
 			# For handling missing values
-			scaler = preprocessing.StandardScaler()
+			scaler = preprocessing.MinMaxScaler()
 			formated_data['data'] = scaler.fit_transform(formated_data['data'])
 
 			# print(formated_data['data'][:,:-1])
